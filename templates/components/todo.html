@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-    <link href="css/style.css" rel="stylesheet">
-  </head>
-  <body>
-    <main>
-        <h1>
-          WE ARE GONNA MAKE IT, AND THAT'S ON GOD!
-        </h1>
-    </main> 
-  </body>
-</html>
+<ul id= "todo-list" class="space-y-3">
+  {% for todo in todo_list.todos %}
+    <li class="flex items-center p-4 bg-slate-50 rounded-xl border border-transparent hover:border-blue-200 transition-all group">
+      <span class="flex-1 text-slate-700 font-medium">{{ todo.description }}</span>
+      <button class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-opacity">
+      </button>
+    </li>
+  {% else %}
+    <li class="text-center py-10">
+        <p class="text-slate-400">Nothing to do...</p>
+    </li>
+  {% endfor %}
+</ul>

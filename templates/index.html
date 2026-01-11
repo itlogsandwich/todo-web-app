@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Todo Web App</title>
     <link href="/output.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
   </head>
   <body>
-    <main>
+    <main class = "flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div class="w-full max-w-lg bg-white shadow-xl rounded-2xl p-8 border border-slate-100">
 
-      <div class = "flex flex-col items-center justify-center min-h-screen bg-gray-100">
-
-        <h1 class = "text-3xl mb-10 text-blue-600"}>
+        <h1 class = " text-center text-2xl text-bold tracking-tight slate-500 mb-10 text-black">
           RUST TODO LIST WEB APP
         </h1>
         
@@ -19,18 +20,11 @@
           {% include "components/input.html" %}
         </div>
 
-        <div>
-          <ul>
-            {% for todo in todo_list.todos %}
-              <li> {{ todo.description }}</li>
-            {% else %}
-              <li> No tasks available </li>
-            {% endfor %}
-          </ul>
+        <div class = "mb-10">
+          {% include "components/todo.html" %}
         </div>
 
       </div>
-
     </main> 
   </body>
 </html>

@@ -12,9 +12,9 @@ use std::sync::{ Arc, Mutex };
 type ApiResult<T> = Result<T, TodoError>;
 
 #[derive(Clone)]
-struct TodoState
+pub struct TodoState
 {
-    todos: Arc<Mutex<TodoList>>,
+   pub todos: Arc<Mutex<TodoList>>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -23,17 +23,13 @@ struct CreateRequest
     description: String,
 }
 
-pub fn api_routes() -> Router
+pub fn api_routes(state: TodoState) -> Router
 {
-    let shared_state = TodoState
-    {
-        todos: Arc::new(Mutex::new(TodoList::new())),
-    };
-
     Router::new()
-        .route("/", get(index).post(add_todo_handler))
+        .route("/", get(index))
+        .route("/todo", post(add_todo_handler))
         .fallback_service(tower_http::services::ServeDir::new("assets"))
-        .with_state(shared_state)
+        .with_state(state)
 }
 
 async fn index(
@@ -55,6 +51,7 @@ async fn index(
 #[axum::debug_handler]
 async fn add_todo_handler(
     State(state): State<TodoState>,
+    headers: HeaderMap,
     Form(payload): Form<CreateRequest>,
 ) -> ApiResult<impl IntoResponse>
 {
@@ -62,17 +59,26 @@ async fn add_todo_handler(
 
     let mut todos = state.todos.lock().unwrap();
 
-    // let is_htmx = headers.contains_key("hx-request");
-    //
-    // if is_htmx
-    // {
-    //     Ok(Response::builder()
-    //         .header("HX-Trigger", "add_todo")
-    //         .body(body_contents)?
-    //         .into_response())
-    // }
-
+    let is_htmx = headers.contains_key("hx-request");
+    
     todos.add_todo(payload.description);
-    Ok(Redirect::to("/"))
+    if is_htmx
+    {
+        let template = AddTemplate 
+        {
+            todo_list: todos.clone(),
+        };
+
+        Ok(HtmlTemplate(template).into_response())
+    }
+    else
+    {
+        let template = IndexTemplate
+        {
+            todo_list: todos.clone(),
+        };
+
+        Ok(HtmlTemplate(template).into_response())
+    }
 }
 
