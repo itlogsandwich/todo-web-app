@@ -82,3 +82,20 @@ async fn add_todo_handler(
     }
 }
 
+async fn delete_todo_handler(
+    State(state): State<TodoState>,
+    headers: HeaderMap,
+) -> ApiResult<impl IntoResponse>
+{
+    println!("---> {:<12} - remove_todo -", "HANDLER");
+
+    let mut todos = state.todos.lock().unwrap();
+
+    let is_htmx = headers.contains_key("hx-request");
+
+    //hmmm how can I pass its index hmmm
+    // todos.remove_todo()
+    //
+    Ok(())
+}
+

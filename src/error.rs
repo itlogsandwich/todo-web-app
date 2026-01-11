@@ -8,6 +8,7 @@ use std::io::Error as IoError;
 pub enum TodoError
 {
     InternalServer(String),
+    IndexOutOfBounds,
 }
 
 impl IntoResponse for TodoError
@@ -17,6 +18,7 @@ impl IntoResponse for TodoError
         let(status, error_message) = match self
         {
             Self::InternalServer(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
+            Self::IndexOutOfBounds => (StatusCode::BAD_REQUEST, "Not Found! Out of Bounds.".to_string()),
         };
 
         let body = Json(json!(
