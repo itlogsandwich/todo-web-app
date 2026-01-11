@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Todo Web App</title>
+    <link href="/output.css" rel="stylesheet">
+  </head>
+  <body>
+    <main>
+
+      <div class = "flex flex-col items-center justify-center min-h-screen bg-gray-100">
+
+        <h1 class = "text-3xl mb-10 text-blue-600"}>
+          RUST TODO LIST WEB APP
+        </h1>
+        
+        <div class = "mb-10">
+          {% include "components/input.html" %}
+        </div>
+
+        <div>
+          <ul>
+            {% for todo in todo_list.todos %}
+              <li> {{ todo.description }}</li>
+            {% else %}
+              <li> No tasks available </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+
+    </main> 
+  </body>
+</html>
