@@ -1,5 +1,5 @@
 use crate::todo_list::TodoList;
-use crate::templates::{ HtmlTemplate, IndexTemplate, TodoTemplate};
+use crate::templates::{ HtmlTemplate, IndexTemplate, TodoTemplate, UpdateTodoTemplate};
 use crate::error::TodoError;
 use axum::{ Router, Form };
 use axum::routing::{ get, post, delete, patch};
@@ -29,7 +29,7 @@ pub fn api_routes(state: TodoState) -> Router
         .route("/", get(index))
         .route("/todo", post(add_todo_handler))
         .route("/todo/delete/{id}", delete(delete_todo_handler))
-        .route("/todo/update/{id}", patch(update_todo_hander))
+        .route("/todo/update/{id}", get(show_update_todo_form_handler).patch(update_todo_hander))
         .fallback_service(tower_http::services::ServeDir::new("assets"))
         .with_state(state)
 }
@@ -82,6 +82,18 @@ async fn add_todo_handler(
 
         Ok(HtmlTemplate(template).into_response())
     }
+}
+
+async fn show_update_todo_form_handler(
+    Path(index): Path<usize>,
+) -> impl IntoResponse
+{
+    let template = UpdateTodoTemplate
+    {
+        index
+    };
+
+    HtmlTemplate(template)
 }
 
 #[axum::debug_handler]
