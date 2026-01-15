@@ -7,10 +7,6 @@ pub struct Todo
     is_done: bool,
 }
 
-struct IdGenerator
-{
-    
-}
 impl Todo 
 {
     pub fn new(description: String) -> Self
@@ -21,6 +17,12 @@ impl Todo
             is_done: false,
         }
     }
+
+    pub fn edit_description(&mut self, new_description: String)
+    {
+        self.description = new_description;
+    }
+
     pub fn toggle_status(&mut self)
     {
         self.is_done = !self.is_done;

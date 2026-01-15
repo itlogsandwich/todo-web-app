@@ -14,18 +14,10 @@ pub struct IndexTemplate
 
 #[derive(Template)]
 #[template(path = "components/todo.html")]
-pub struct AddTemplate
+pub struct TodoTemplate
 {
     pub todo_list: TodoList
 }
-
-// #[derive(Template)]
-// #[template(path = "components/todo.html")]
-// pub struct TodoTemplate 
-// {
-//     todo: Todo,
-// }
-
 
 pub struct HtmlTemplate<T>(pub T);
 

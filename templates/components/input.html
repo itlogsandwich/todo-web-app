@@ -1,5 +1,5 @@
 <form
-  hx-post = "/todo" hx-target = "#todo-list" hx-swap = "innerHTML"
+  hx-post = "/todo" hx-target = "#todo-list" hx-swap = "outerHTML" hx-on::after-request="if(event.detail.successful) this.reset()"
   class="flex w-full max-w-md gap-2 p-2 border-2 border-gray-200 rounded-full focus-within:border-blue-500">
   
   <input type = "text" name = "description" placeholder = "What to do..?"

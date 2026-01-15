@@ -22,22 +22,29 @@ impl TodoList
         self.todos.push(todo);
     }
 
-    pub fn remove_todo(&mut self, id: u64) -> TodoListResult<()>
+    pub fn remove_todo(&mut self, id: usize) -> TodoListResult<()>
     {
-        if (id as usize) > self.todos.len() || (id as usize) < self.todos.len()
+        if id > self.todos.len()
         {
             return Err(TodoError::IndexOutOfBounds);
         }
         
-        self.todos.remove(id as usize);
+        self.todos.remove(id);
 
         Ok(())
     }
 
-    pub fn update_todo(&mut self, description: String)
+    pub fn update_todo(&mut self, id: usize, new_description: String) -> TodoListResult<()>
     {
-        let todo = Todo::new(description);    
-        self.todos.push(todo);
+
+        if id > self.todos.len()
+        {
+            return Err(TodoError::IndexOutOfBounds);
+        }
+
+        self.todos.get_mut(id).ok_or(TodoError::IndexOutOfBounds)?.edit_description(new_description);
+
+        Ok(())
     }  
 
 }

@@ -9,7 +9,8 @@ mod todo;
 mod todo_list;
 mod routes;
 
-#[tokio::main] async fn main() -> Result<(), TodoError> 
+#[tokio::main] 
+async fn main() -> Result<(), TodoError> 
 {
     let shared_state = routes::TodoState
     {
