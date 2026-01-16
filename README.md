@@ -11,6 +11,11 @@ I don't know if it's a skill issue or it's really just that hard.
 git clone https://github.com/itlogsandwich/todo-web-app
 cd todo-web-app
 
+create .env file and ensure it contains DATABASE_URL, refer to .env.example
+
+install tailwind cli
+build the css, npx tailwindcss -i ./assets/input.css -o ./assets/output.css
+
 cargo run -r 
 ```
 
@@ -22,7 +27,7 @@ systemctl start postgresql.service
 
 psql -U [user] -D [database_name] -h localhost -W
 
-sqlx database create // make sure that you have an .env file and the db url, refer to the .env.example file
+sqlx database create // ensure that you have an .env file and the db url, refer to .env.example file
 sqlx migrate add -r [migration name]
 sqlx migrate run
 ```
