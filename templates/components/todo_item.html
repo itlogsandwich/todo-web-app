@@ -1,4 +1,4 @@
-<li id = "todo-item-{{index}}" class="flex items-center p-4 bg-slate-50 rounded-xl border border-transparent hover:border-blue-200 transition-all group">
+<li id = "todo-item-{{index}}" class="flex items-center p-4 bg-slate-50 rounded-lg border border-transparent hover:border-blue-200 transition-all group">
     <span class="flex-1 text-slate-700 font-medium">{{ todo.description }}</span>
 
     <button hx-get = "/todo/update/{{index}}" hx-target = "#todo-item-{{index}}" hx-swap = "innerHTML" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-blue-600 transition-opacity">
