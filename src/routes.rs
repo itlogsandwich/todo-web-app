@@ -1,5 +1,5 @@
 use crate::todo_list::TodoList;
-use crate::templates::{ HtmlTemplate, IndexTemplate, TodoTemplate, UpdateTodoTemplate};
+use crate::templates::{ HtmlTemplate, IndexTemplate, TodoTemplate, TodoItemTemplate, UpdateTodoTemplate};
 use crate::error::TodoError;
 use axum::{ Router, Form };
 use axum::routing::{ get, post, delete, patch};
@@ -108,28 +108,17 @@ async fn update_todo_hander(
 
     let mut todos = state.todos.lock().unwrap();
 
-    let is_htmx = headers.contains_key("hx-request");
-
     todos.update_todo(index, payload.description)?;
+        
+    let updated_todo = todos.todos[index].clone();
 
-    if is_htmx
+    let template = TodoItemTemplate
     {
-        let template = TodoTemplate
-        {
-            todo_list: todos.clone(),
-        };
+        todo: updated_todo,
+        index,
+    };
 
-        Ok(HtmlTemplate(template).into_response())
-    }
-    else
-    {
-        let template = IndexTemplate
-        {
-            todo_list: todos.clone(),
-        };
-
-        Ok(HtmlTemplate(template).into_response())
-    }
+    Ok(HtmlTemplate(template))
 }
 
 #[axum::debug_handler]

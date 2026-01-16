@@ -18,6 +18,15 @@ pub struct TodoTemplate
     pub todo_list: TodoList
 }
 
+
+#[derive(Template)]
+#[template(path = "components/todo_item.html")]
+pub struct TodoItemTemplate
+{
+    pub todo: Todo,
+    pub index: usize,
+}
+
 #[derive(Template)]
 #[template(path = "components/update.html")]
 pub struct UpdateTodoTemplate
