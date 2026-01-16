@@ -1,20 +1,18 @@
-use crate::todo_list::TodoList;
+use crate::todo::Todo;
 use crate::templates::{ HtmlTemplate, IndexTemplate, TodoTemplate, TodoItemTemplate, UpdateTodoTemplate};
 use crate::error::TodoError;
 use axum::{ Router, Form };
-use axum::routing::{ get, post, delete, patch};
-use axum::response::{IntoResponse , Response, Redirect };
+use axum::routing::{ get, post, delete};
+use axum::response::{IntoResponse};
 use axum::extract::{ State, Path };
-use axum::http::HeaderMap;
 use serde::{ Serialize, Deserialize};
-use std::sync::{ Arc, Mutex };
 
 type ApiResult<T> = Result<T, TodoError>;
 
 #[derive(Clone)]
 pub struct TodoState
 {
-   pub todos: Arc<Mutex<TodoList>>,
+    pub db: sqlx::PgPool
 }
 
 #[derive(Serialize, Deserialize)]
@@ -40,11 +38,16 @@ async fn index(
 {
     println!("---> {:<12} - index - ", "HANDLER");
     
-    let todos = state.todos.lock().unwrap();
+    let todos = sqlx::query_as!(
+        Todo,
+        "SELECT id, description, is_complete FROM todos ORDER BY id ASC"
+    )
+    .fetch_all(&state.db)
+    .await?;
 
     let template = IndexTemplate 
     {
-        todo_list: todos.clone(),
+        todo_list: todos,
     };
 
     Ok(HtmlTemplate(template))
@@ -53,44 +56,41 @@ async fn index(
 #[axum::debug_handler]
 async fn add_todo_handler(
     State(state): State<TodoState>,
-    headers: HeaderMap,
     Form(payload): Form<CreateRequest>,
 ) -> ApiResult<impl IntoResponse>
 {
     println!("---> {:<12} - add_todo - ", "HANDLER");
 
-    let mut todos = state.todos.lock().unwrap();
+    sqlx::query!(
+        "INSERT INTO todos (description) VALUES ($1)",
+        payload.description
+    )
+    .execute(&state.db)
+    .await?;
 
-    let is_htmx = headers.contains_key("hx-request");
+    let todos = sqlx::query_as!(
+        Todo,
+        "SELECT id, description, is_complete FROM todos ORDER BY id ASC"
+    )
+    .fetch_all(&state.db)
+    .await?;
+
+    let template = TodoTemplate
+    {
+        todo_list: todos
+    };
+
+    Ok(HtmlTemplate(template))
     
-    todos.add_todo(payload.description);
-    if is_htmx
-    {
-        let template = TodoTemplate 
-        {
-            todo_list: todos.clone(),
-        };
-
-        Ok(HtmlTemplate(template).into_response())
-    }
-    else
-    {
-        let template = IndexTemplate
-        {
-            todo_list: todos.clone(),
-        };
-
-        Ok(HtmlTemplate(template).into_response())
-    }
 }
 
 async fn show_update_todo_form_handler(
-    Path(index): Path<usize>,
+    Path(id): Path<i32>,
 ) -> impl IntoResponse
 {
     let template = UpdateTodoTemplate
     {
-        index
+        id
     };
 
     HtmlTemplate(template)
@@ -99,23 +99,31 @@ async fn show_update_todo_form_handler(
 #[axum::debug_handler]
 async fn update_todo_hander(
     State(state): State<TodoState>,
-    headers: HeaderMap,
-    Path(index): Path<usize>,
+    Path(id): Path<i32>,
     Form(payload): Form<CreateRequest>,
 ) -> ApiResult<impl IntoResponse>
 {
-    println!("---> {:<12} - update_todo - ", "HANDLER");
+    println!("---> {:<12} - update_todo -", "HANDLER");
 
-    let mut todos = state.todos.lock().unwrap();
+    sqlx::query!(
+        "UPDATE todos SET description = $2 WHERE id = $1",
+        id,
+        payload.description,
+    )
+    .execute(&state.db)
+    .await?;
 
-    todos.update_todo(index, payload.description)?;
-        
-    let updated_todo = todos.todos[index].clone();
+    let updated_todo = sqlx::query_as!(
+        Todo,
+        "SELECT id, description, is_complete FROM todos WHERE id = $1",
+        id
+    )
+    .fetch_one(&state.db)
+    .await?;
 
     let template = TodoItemTemplate
     {
         todo: updated_todo,
-        index,
     };
 
     Ok(HtmlTemplate(template))
@@ -124,35 +132,30 @@ async fn update_todo_hander(
 #[axum::debug_handler]
 async fn delete_todo_handler(
     State(state): State<TodoState>,
-    headers: HeaderMap,
-    Path(index): Path<usize>,
+    Path(id): Path<i32>,
 ) -> ApiResult<impl IntoResponse>
 {
-    println!("---> {:<12} - remove_todo -", "HANDLER");
+    println!("---> {:<12} - delete_todo -", "HANDLER");
 
-    let mut todos = state.todos.lock().unwrap();
+    sqlx::query!(
+        "DELETE FROM todos WHERE id = $1",
+        id
+    )
+    .execute(&state.db)
+    .await?;
+    
+    let todos = sqlx::query_as!(
+        Todo,
+        "SELECT id, description, is_complete FROM todos ORDER BY id ASC"
+    )
+    .fetch_all(&state.db)
+    .await?;
 
-    let is_htmx = headers.contains_key("hx-request");
-
-    todos.remove_todo(index)?;
-
-    if is_htmx
+    let template = TodoTemplate
     {
-        let template = TodoTemplate 
-        {
-            todo_list: todos.clone(),
-        };
+        todo_list: todos
+    };
 
-        Ok(HtmlTemplate(template).into_response())
-    }
-    else
-    {
-        let template = IndexTemplate
-        {
-            todo_list: todos.clone(),
-        };
-
-        Ok(HtmlTemplate(template).into_response())
-    }
+    Ok(HtmlTemplate(template))
 }
 

@@ -1,6 +1,5 @@
 use crate::error::TodoError;
 use crate::todo::Todo;
-use crate::todo_list::TodoList;
 use askama::Template;
 use axum::response::{ IntoResponse, Response, Html } ;
 
@@ -8,14 +7,14 @@ use axum::response::{ IntoResponse, Response, Html } ;
 #[template(path = "index.html")]
 pub struct IndexTemplate
 {
-    pub todo_list: TodoList
+    pub todo_list: Vec<Todo>
 }
 
 #[derive(Template)]
 #[template(path = "components/todo.html")]
 pub struct TodoTemplate
 {
-    pub todo_list: TodoList
+    pub todo_list: Vec<Todo>
 }
 
 
@@ -24,14 +23,13 @@ pub struct TodoTemplate
 pub struct TodoItemTemplate
 {
     pub todo: Todo,
-    pub index: usize,
 }
 
 #[derive(Template)]
 #[template(path = "components/update.html")]
 pub struct UpdateTodoTemplate
 {
-    pub index: usize
+    pub id: i32
 }
 
 pub struct HtmlTemplate<T>(pub T);

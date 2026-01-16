@@ -1,20 +1,22 @@
 use serde::{ Serialize, Deserialize };
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Todo
 {
+    pub id: i32,
     pub description: String,
-    is_done: bool,
+    pub is_complete: bool,
 }
 
 impl Todo 
 {
-    pub fn new(description: String) -> Self
+    pub fn new(id: i32, description: String) -> Self
     {
         Self
         {
+            id,
             description,
-            is_done: false,
+            is_complete: false,
         }
     }
 
@@ -23,8 +25,8 @@ impl Todo
         self.description = new_description;
     }
 
-    pub fn toggle_status(&mut self)
-    {
-        self.is_done = !self.is_done;
-    }
+    // pub fn toggle_status(&mut self)
+    // {
+    //     self.is_done = !self.is_done;
+    // }
 }

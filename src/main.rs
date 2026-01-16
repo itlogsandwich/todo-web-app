@@ -1,21 +1,21 @@
 use crate::error::TodoError;
-use crate::todo_list::TodoList;
-use axum::{ Router };
-use std::sync::{ Arc, Mutex };
 
+mod db;
 mod templates;
 mod error;
 mod todo;
-mod todo_list;
 mod routes;
 
 #[tokio::main] 
 async fn main() -> Result<(), TodoError> 
 {
+    dotenvy::dotenv().ok();
     let shared_state = routes::TodoState
     {
-        todos: Arc::new(Mutex::new(TodoList::new())),
+        db: db::connect_to_db().await?
     };
+
+    sqlx::migrate!().run(&shared_state.db).await.unwrap();
 
     let app = routes::api_routes(shared_state);
 

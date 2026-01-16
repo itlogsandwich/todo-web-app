@@ -3,6 +3,8 @@ use axum::response::{ IntoResponse, Response};
 use axum::http::{ StatusCode, Error as AxumError };
 use serde_json::json;
 use std::io::Error as IoError;
+use sqlx::Error as SqlxError;
+use std::env::VarError;
 
 #[derive(Debug)]
 pub enum TodoError
@@ -42,6 +44,22 @@ impl From<AxumError> for TodoError
 impl From<IoError> for TodoError
 {
     fn from(err: IoError) ->  Self 
+    {
+        Self::InternalServer(err.to_string())
+    }
+}
+
+impl From<SqlxError> for TodoError
+{
+    fn from(err: SqlxError) -> Self
+    {
+        Self::InternalServer(err.to_string())
+    }
+}
+
+impl From<VarError> for TodoError
+{
+    fn from(err: VarError) -> Self
     {
         Self::InternalServer(err.to_string())
     }
