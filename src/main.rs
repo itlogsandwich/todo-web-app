@@ -1,9 +1,9 @@
 use crate::error::TodoError;
 
+mod todo;
 mod db;
 mod templates;
 mod error;
-mod todo;
 mod routes;
 
 #[tokio::main] 
