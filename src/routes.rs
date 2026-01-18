@@ -41,7 +41,7 @@ async fn index(
     
     let todos = sqlx::query_as!(
         Todo,
-        "SELECT id, description, is_complete FROM todos ORDER BY id ASC"
+        "SELECT id, description, is_complete FROM todos ORDER BY is_complete ASC"
     )
     .fetch_all(&state.db)
     .await?;
@@ -71,7 +71,7 @@ async fn add_todo_handler(
 
     let todos = sqlx::query_as!(
         Todo,
-        "SELECT id, description, is_complete FROM todos ORDER BY id ASC"
+        "SELECT id, description, is_complete FROM todos ORDER BY is_complete ASC"
     )
     .fetch_all(&state.db)
     .await?;
@@ -166,7 +166,8 @@ async fn change_status_handler(
 
     let updated_todo = sqlx::query_as!(
         Todo,
-        "SELECT id, description, is_complete FROM todos ORDER BY id ASC"
+        "SELECT id, description, is_complete FROM todos WHERE id = $1",
+        id
     )
     .fetch_one(&state.db)
     .await?;
