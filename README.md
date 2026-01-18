@@ -31,4 +31,6 @@ sqlx database create // ensure that you have an .env file and the db url, refer 
 sqlx migrate add -r [migration name]
 sqlx migrate run
 ```
+## Appearance
+<img width="580" height="471" alt="image" src="https://github.com/user-attachments/assets/392ffd65-8331-4890-bdca-fe848f1fc7d5" />
 
